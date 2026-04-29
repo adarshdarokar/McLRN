@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Experience the pursuit of perfection with McLaren's latest hypercars.">
+    <title>McLaren | The Pursuit of Perfection</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="scroll-container">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="logo">McLAREN</div>
+            <ul class="nav-links">
+                <li><a href="#models">Models</a></li>
+                <li><a href="#performance">Performance</a></li>
+                <li><a href="#innovation">Innovation</a></li>
+            </ul>
+            <button class="btn-primary">Build Yours</button>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="hero" id="hero">
+            <div class="video-container">
+                <video autoplay muted loop playsinline id="hero-video">
+                    <!-- Using a high quality placeholder racing/car video -->
+                    <source src="https://assets.mixkit.co/videos/preview/mixkit-fast-sports-car-driving-on-a-highway-42821-large.mp4" type="video/mp4">
+                </video>
+                <div class="overlay"></div>
+            </div>
+            <div class="hero-content">
+                <h1 class="reveal-text"><span>THE RULE</span> <span>BREAKER</span></h1>
+                <p class="reveal-text delay-1">Uncompromised performance. Pure adrenaline.</p>
+                <button class="btn-outline reveal-text delay-2">Discover 750S</button>
+            </div>
+            <div class="scroll-indicator">
+                <div class="mouse">
+                    <div class="wheel"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Image Reveal / Intro -->
+        <section class="intro section-padding">
+            <div class="container">
+                <div class="intro-grid">
+                    <div class="intro-text fade-in-up">
+                        <h2 class="heading-large">Form Follows Function</h2>
+                        <p>Every curve, every line, every millimeter is designed with a singular purpose: to deliver the most exhilarating driving experience possible. There is no wasted space, no unnecessary weight.</p>
+                    </div>
+                    <div class="intro-image parallax-img-container">
+                        <img src="https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80" alt="McLaren Detail" class="parallax-img">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Horizontal Scroll Showcase -->
+        <section class="showcase" id="models">
+            <div class="sticky-wrapper">
+                <div class="horizontal-scroll-container">
+                    <div class="showcase-header">
+                        <h2 class="heading-large fade-in-up">The Lineup</h2>
+                    </div>
+                    <div class="horizontal-track">
+                        <div class="car-card">
+                            <img src="https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="McLaren 750S">
+                            <div class="card-info">
+                                <h3>750S</h3>
+                                <p>The lightest and most powerful series-production McLaren.</p>
+                            </div>
+                        </div>
+                        <div class="car-card">
+                            <img src="https://images.unsplash.com/photo-1599863484831-27771746200d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="McLaren Artura">
+                            <div class="card-info">
+                                <h3>Artura</h3>
+                                <p>Next-generation hybrid supercar.</p>
+                            </div>
+                        </div>
+                        <div class="car-card">
+                            <img src="https://images.unsplash.com/photo-1612040989332-9dfbc448378d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="McLaren GT">
+                            <div class="card-info">
+                                <h3>GT</h3>
+                                <p>Rules are meant to be broken.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Performance Stats -->
+        <section class="performance section-padding" id="performance">
+            <div class="container text-center">
+                <h2 class="heading-large fade-in-up">Beyond Limits</h2>
+                <div class="stats-grid">
+                    <div class="stat-item fade-in-up delay-1">
+                        <span class="stat-number" data-target="750">0</span>
+                        <span class="stat-unit">PS</span>
+                        <p class="stat-desc">Maximum Power</p>
+                    </div>
+                    <div class="stat-item fade-in-up delay-2">
+                        <span class="stat-number" data-target="2.8">0</span>
+                        <span class="stat-unit">s</span>
+                        <p class="stat-desc">0-100 km/h</p>
+                    </div>
+                    <div class="stat-item fade-in-up delay-3">
+                        <span class="stat-number" data-target="1277">0</span>
+                        <span class="stat-unit">kg</span>
+                        <p class="stat-desc">Lightest Dry Weight</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Feature Highlights -->
+        <section class="features" id="innovation">
+            <div class="feature-row">
+                <div class="feature-content fade-in-up">
+                    <h3 class="heading-medium">Carbon Fibre Architecture</h3>
+                    <p>The Monocage II-S is the exceptionally strong, light and stiff carbon fibre tub at the heart of the car.</p>
+                </div>
+                <div class="feature-image parallax-img-container">
+                    <img src="https://images.unsplash.com/photo-1544829099-b9a0c07fad1a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="Carbon Fibre" class="parallax-img">
+                </div>
+            </div>
+            <div class="feature-row reverse">
+                <div class="feature-content fade-in-up">
+                    <h3 class="heading-medium">Active Aerodynamics</h3>
+                    <p>An active rear wing adapts to optimize downforce, drag, and braking performance dynamically.</p>
+                </div>
+                <div class="feature-image parallax-img-container">
+                    <img src="https://images.unsplash.com/photo-1621256385202-bdf95ea2cf84?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="Aerodynamics" class="parallax-img">
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <div class="footer-grid">
+                    <div class="footer-brand">
+                        <h2>McLAREN</h2>
+                        <p>Pioneers of performance.</p>
+                    </div>
+                    <div class="footer-links">
+                        <h4>Explore</h4>
+                        <ul>
+                            <li><a href="#">Models</a></li>
+                            <li><a href="#">Ownership</a></li>
+                            <li><a href="#">Motorsport</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-links">
+                        <h4>Legal</h4>
+                        <ul>
+                            <li><a href="#">Privacy Policy</a></li>
+                            <li><a href="#">Terms of Use</a></li>
+                            <li><a href="#">Cookies</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <p>&copy; 2025 McLaren Automotive Limited. This is a concept demo.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
