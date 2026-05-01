@@ -7,6 +7,10 @@ gsap.registerPlugin(ScrollTrigger);
 
 const FRAME_COUNT = 40;
 
+// Easing factor for the buttery smooth interpolation (0 to 1).
+// Lower = smoother but more delayed.
+const LERP_FACTOR = 0.08;
+
 const ScrollStory = memo(() => {
   const containerRef = useRef(null);
   const canvasRef = useRef(null);
@@ -14,109 +18,175 @@ const ScrollStory = memo(() => {
   const phase2Ref = useRef(null);
   const phase3Ref = useRef(null);
 
-  const lastDrawnFrameRef = useRef(-1);
+  // We only care about initial load to show the UI quickly
+  const [initialLoaded, setInitialLoaded] = useState(false);
 
-  // Use a custom hook or local logic to preload images.
-  // For simplicity here, we write it locally inside the component.
-  const [images, setImages] = useState([]);
-  const [loaded, setLoaded] = useState(false);
-  const [loadingProgress, setLoadingProgress] = useState(0);
+  // Instead of React state, keep images in a ref to avoid re-renders
+  const imagesRef = useRef([]);
+  // Track loaded status per image
+  const imageLoadStatusRef = useRef(new Array(FRAME_COUNT).fill(false));
+
+  // Animation states
+  const targetFrameRef = useRef(0);
+  const currentFrameRef = useRef(0);
+  const renderRequestedRef = useRef(false);
+
+  // Cache rendering dimensions so we don't recalculate on every frame
+  const renderDimsRef = useRef({ width: 0, height: 0, x: 0, y: 0 });
 
   useEffect(() => {
-    const loadedImages = [];
-    let loadedCount = 0;
+    // 1. Load the first frame immediately so we can render the canvas
+    const firstImg = new Image();
+    const firstIndexStr = (1).toString().padStart(3, '0');
+    firstImg.src = `/frames/ezgif-frame-${firstIndexStr}.jpg`;
+    
+    firstImg.onload = () => {
+      imagesRef.current[0] = firstImg;
+      imageLoadStatusRef.current[0] = true;
+      setInitialLoaded(true);
 
-    for (let i = 1; i <= FRAME_COUNT; i++) {
+      // 2. Start background loading for the rest of the sequence
+      for (let i = 2; i <= FRAME_COUNT; i++) {
         const img = new Image();
         const paddedIndex = i.toString().padStart(3, '0');
         img.src = `/frames/ezgif-frame-${paddedIndex}.jpg`;
         
         img.onload = () => {
-            loadedCount++;
-            setLoadingProgress(Math.round((loadedCount / FRAME_COUNT) * 100));
-            if (loadedCount === FRAME_COUNT) {
-                setLoaded(true);
-            }
+          imagesRef.current[i - 1] = img;
+          imageLoadStatusRef.current[i - 1] = true;
+          // Trigger a render just in case this is the frame we are currently waiting for
+          requestRender();
         };
-        loadedImages.push(img);
-    }
-    setImages(loadedImages);
+      }
+    };
   }, []);
 
+  // Safe wrapper for requestAnimationFrame
+  const requestRender = () => {
+    if (!renderRequestedRef.current) {
+      renderRequestedRef.current = true;
+      requestAnimationFrame(renderLoop);
+    }
+  };
+
+  const renderLoop = () => {
+    renderRequestedRef.current = false;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d', { alpha: false });
+    if (!ctx) return;
+
+    // Lerp current frame towards target frame
+    let current = currentFrameRef.current;
+    const target = targetFrameRef.current;
+    
+    // If we're close enough, snap to target
+    if (Math.abs(target - current) < 0.001) {
+      current = target;
+    } else {
+      current += (target - current) * LERP_FACTOR;
+    }
+    
+    currentFrameRef.current = current;
+
+    // Draw the frames using blending for ultra-smooth sub-frame rendering
+    const index1 = Math.floor(current);
+    const index2 = Math.min(FRAME_COUNT - 1, index1 + 1);
+    const blendRatio = current - index1;
+
+    const img1 = imagesRef.current[index1];
+    const img2 = imagesRef.current[index2];
+    
+    const dims = renderDimsRef.current;
+
+    // Base background
+    ctx.globalAlpha = 1.0;
+    ctx.fillStyle = '#1E1F22';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Draw lower frame fully opaque
+    if (img1 && imageLoadStatusRef.current[index1]) {
+      ctx.drawImage(img1, dims.x, dims.y, dims.width, dims.height);
+    }
+
+    // Draw upper frame on top with partial opacity for crossfade effect
+    if (blendRatio > 0 && img2 && imageLoadStatusRef.current[index2]) {
+      ctx.globalAlpha = blendRatio;
+      ctx.drawImage(img2, dims.x, dims.y, dims.width, dims.height);
+      ctx.globalAlpha = 1.0; // Reset
+    }
+
+    // Continue loop if we haven't reached the target
+    if (current !== target) {
+      requestRender();
+    }
+  };
+
   useEffect(() => {
-    if (!loaded || images.length === 0) return;
+    if (!initialLoaded) return;
+
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const context = canvas.getContext('2d', { alpha: false });
+
+    // Calculate dimensions ONLY on resize, not every frame
+    const calculateDimensions = () => {
+      const parent = canvas.parentElement;
+      const width = parent.clientWidth;
+      const height = parent.clientHeight;
+      const pxRatio = Math.min(window.devicePixelRatio || 1, 2); 
+
+      canvas.width = width * pxRatio;
+      canvas.height = height * pxRatio;
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+
+      // Set constant properties once
+      context.imageSmoothingEnabled = true;
+      context.imageSmoothingQuality = 'high';
+
+      // Assuming first image is available to get aspect ratio
+      const firstImage = imagesRef.current[0];
+      if (firstImage) {
+        const canvasAspect = canvas.width / canvas.height;
+        const imgAspect = firstImage.width / firstImage.height;
+        
+        let drawWidth, drawHeight, offsetX, offsetY;
+        
+        if (canvasAspect > imgAspect) {
+          drawWidth = canvas.width;
+          drawHeight = firstImage.height * (canvas.width / firstImage.width);
+          offsetX = 0;
+          offsetY = (canvas.height - drawHeight) / 2;
+        } else {
+          drawHeight = canvas.height;
+          drawWidth = firstImage.width * (canvas.height / firstImage.height);
+          offsetX = (canvas.width - drawWidth) / 2;
+          offsetY = 0;
+        }
+        
+        renderDimsRef.current = {
+          width: Math.round(drawWidth),
+          height: Math.round(drawHeight),
+          x: Math.round(offsetX),
+          y: Math.round(offsetY)
+        };
+      }
+
+      // Force a redraw after resize
+      requestRender();
+    };
+
+    let resizeTimeout;
+    const debouncedResize = () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(calculateDimensions, 150);
+    };
+
+    calculateDimensions();
+    window.addEventListener('resize', debouncedResize, { passive: true });
 
     let ctx = gsap.context(() => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      const context = canvas.getContext('2d', { alpha: false });
-
-      const drawFrame = (frameIndex) => {
-        if (frameIndex === lastDrawnFrameRef.current) return;
-        lastDrawnFrameRef.current = frameIndex;
-
-        const currentImage = images[frameIndex];
-        
-        if (currentImage && context) {
-          const canvasAspect = canvas.width / canvas.height;
-          const imgAspect = currentImage.width / currentImage.height;
-          
-          let drawWidth, drawHeight, offsetX, offsetY;
-          
-          if (canvasAspect > imgAspect) {
-            drawWidth = canvas.width;
-            drawHeight = currentImage.height * (canvas.width / currentImage.width);
-            offsetX = 0;
-            offsetY = (canvas.height - drawHeight) / 2;
-          } else {
-            drawHeight = canvas.height;
-            drawWidth = currentImage.width * (canvas.height / currentImage.height);
-            offsetX = (canvas.width - drawWidth) / 2;
-            offsetY = 0;
-          }
-          
-          drawWidth = Math.round(drawWidth);
-          drawHeight = Math.round(drawHeight);
-          offsetX = Math.round(offsetX);
-          offsetY = Math.round(offsetY);
-          
-          context.fillStyle = '#1E1F22';
-          context.fillRect(0, 0, canvas.width, canvas.height);
-          
-          context.imageSmoothingEnabled = true;
-          context.imageSmoothingQuality = 'high';
-          
-          context.drawImage(currentImage, offsetX, offsetY, drawWidth, drawHeight);
-        }
-      };
-
-      const resizeCanvas = () => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-        const parent = canvas.parentElement;
-        const width = parent.clientWidth;
-        const height = parent.clientHeight;
-        const pxRatio = Math.min(window.devicePixelRatio || 1, 2); 
-
-        canvas.width = width * pxRatio;
-        canvas.height = height * pxRatio;
-        canvas.style.width = `${width}px`;
-        canvas.style.height = `${height}px`;
-
-        lastDrawnFrameRef.current = -1;
-        drawFrame(0);
-      };
-
-      let resizeTimeout;
-      const debouncedResize = () => {
-        clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(resizeCanvas, 150);
-      };
-
-      resizeCanvas();
-      window.addEventListener('resize', debouncedResize, { passive: true });
-
-      // Create a timeline instead of manually calculating styles.
       const tl = gsap.timeline({
         scrollTrigger: {
             trigger: containerRef.current,
@@ -127,21 +197,20 @@ const ScrollStory = memo(() => {
         }
       });
 
-      let lastProgress = -1;
-
-      // Update frame on progress
       tl.to({}, {
-          duration: 1, // Timeline length 1 to easily map percentages
+          duration: 1, 
           onUpdate(self) {
               const progress = this.progress();
-              if (Math.abs(progress - lastProgress) < 0.0005) return;
-              lastProgress = progress;
-              
-              const frameIndex = Math.min(
+              // Calculate target frame instead of direct rendering
+              const targetFrame = Math.min(
                 FRAME_COUNT - 1,
-                Math.floor(progress * (FRAME_COUNT - 1))
+                progress * (FRAME_COUNT - 1)
               );
-              drawFrame(frameIndex);
+              
+              if (Math.abs(targetFrameRef.current - targetFrame) > 0.0001) {
+                 targetFrameRef.current = targetFrame;
+                 requestRender();
+              }
           }
       }, 0);
 
@@ -155,23 +224,21 @@ const ScrollStory = memo(() => {
       // Phase 3 (0.6 -> 1.0)
       tl.fromTo(phase3Ref.current, { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.2 }, 0.6);
 
-      return () => {
-        window.removeEventListener('resize', debouncedResize);
-        clearTimeout(resizeTimeout);
-      };
     }, containerRef);
 
-    return () => ctx.revert();
-  }, [loaded, images]);
+    return () => {
+      window.removeEventListener('resize', debouncedResize);
+      clearTimeout(resizeTimeout);
+      ctx.revert();
+    };
+  }, [initialLoaded]);
 
-  if (!loaded) {
+  if (!initialLoaded) {
+    // Keep a much simpler, faster initial loader
     return (
       <div className="scroll-loading-screen">
         <h2>SYSTEM BOOT</h2>
-        <div className="progress-bar-container">
-          <div className="progress-bar" style={{ width: `${loadingProgress}%` }}></div>
-        </div>
-        <p>{loadingProgress}%</p>
+        {/* We removed the heavy progress bar that causes 40 re-renders */}
       </div>
     );
   }
