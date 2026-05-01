@@ -1,11 +1,11 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, memo } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import './Navbar.css';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const Navbar = () => {
+const Navbar = memo(() => {
   const navRef = useRef(null);
 
   useEffect(() => {
@@ -23,6 +23,8 @@ const Navbar = () => {
         }
       ).progress(1);
 
+      let isScrolled = false;
+
       ScrollTrigger.create({
         start: 'top top',
         end: 'max',
@@ -33,10 +35,14 @@ const Navbar = () => {
             showNav.play();
           }
           
-          if (self.scroll() > 50) {
-            navRef.current.classList.add('scrolled');
-          } else {
-            navRef.current.classList.remove('scrolled');
+          const shouldBeScrolled = self.scroll() > 50;
+          if (shouldBeScrolled !== isScrolled) {
+            isScrolled = shouldBeScrolled;
+            if (isScrolled) {
+              navRef.current.classList.add('scrolled');
+            } else {
+              navRef.current.classList.remove('scrolled');
+            }
           }
         },
       });
@@ -62,6 +68,6 @@ const Navbar = () => {
       </div>
     </nav>
   );
-};
+});
 
 export default Navbar;

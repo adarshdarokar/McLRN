@@ -79,6 +79,8 @@
     background: linear-gradient(90deg, var(--color-orange), #ffb299);
     border-radius: 2px;
     width: 0%; /* Animated via GSAP */
+    transform-origin: left;
+    will-change: transform;
 }
 
 @media (max-width: 768px) {

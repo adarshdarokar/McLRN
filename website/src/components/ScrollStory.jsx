@@ -47,16 +47,17 @@ const ScrollStory = memo(() => {
     if (!loaded || images.length === 0) return;
 
     let ctx = gsap.context(() => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const context = canvas.getContext('2d', { alpha: false });
+
       const drawFrame = (frameIndex) => {
         if (frameIndex === lastDrawnFrameRef.current) return;
         lastDrawnFrameRef.current = frameIndex;
 
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-        const context = canvas.getContext('2d', { alpha: false });
         const currentImage = images[frameIndex];
         
-        if (currentImage) {
+        if (currentImage && context) {
           const canvasAspect = canvas.width / canvas.height;
           const imgAspect = currentImage.width / currentImage.height;
           
@@ -122,15 +123,20 @@ const ScrollStory = memo(() => {
             start: 'top top',
             end: '+=300%', // pin for 3 viewport heights
             pin: true,
-            scrub: 0.5, // slight smoothing
+            scrub: true, // Ultra-responsive sync
         }
       });
+
+      let lastProgress = -1;
 
       // Update frame on progress
       tl.to({}, {
           duration: 1, // Timeline length 1 to easily map percentages
           onUpdate(self) {
               const progress = this.progress();
+              if (Math.abs(progress - lastProgress) < 0.0005) return;
+              lastProgress = progress;
+              
               const frameIndex = Math.min(
                 FRAME_COUNT - 1,
                 Math.floor(progress * (FRAME_COUNT - 1))

@@ -1,11 +1,11 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, memo } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import './CarShowcase.css';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const CarShowcase = () => {
+const CarShowcase = memo(() => {
   const sectionRef = useRef(null);
   const carRef = useRef(null);
 
@@ -60,7 +60,7 @@ const CarShowcase = () => {
       
       <div className="showcase-interactive">
         <div className="car-container" ref={carRef}>
-          <img src="/images/aero.png" alt="McLaren Aero" className="main-car-img" loading="lazy" />
+          <img src="/images/aero.png" alt="McLaren Aero" className="main-car-img" loading="lazy" decoding="async" />
           
           <div className="hotspot pos-1">
             <span className="dot"></span>
@@ -89,6 +89,6 @@ const CarShowcase = () => {
       </div>
     </section>
   );
-};
+});
 
 export default CarShowcase;

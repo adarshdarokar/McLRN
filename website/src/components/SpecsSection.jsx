@@ -1,11 +1,11 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, memo } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import './SpecsSection.css';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const SpecsSection = () => {
+const SpecsSection = memo(() => {
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -25,10 +25,11 @@ const SpecsSection = () => {
 
       fills.forEach((fill) => {
         const width = fill.getAttribute('data-width');
+        gsap.set(fill, { width: width });
         gsap.fromTo(fill,
-          { width: '0%' },
+          { scaleX: 0 },
           {
-            width: width, duration: 1, ease: 'power3.out',
+            scaleX: 1, duration: 1, ease: 'power3.out',
             scrollTrigger: { trigger: fill.parentElement, start: 'top 85%', toggleActions: 'play none none reverse' }
           }
         );
@@ -72,6 +73,6 @@ const SpecsSection = () => {
       </div>
     </section>
   );
-};
+});
 
 export default SpecsSection;

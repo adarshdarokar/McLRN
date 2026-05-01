@@ -1,8 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, memo } from 'react';
 import gsap from 'gsap';
 import './HeroSection.css';
 
-const HeroSection = () => {
+const HeroSection = memo(() => {
   const containerRef = useRef(null);
   const titleRef = useRef(null);
   const subtitleRef = useRef(null);
@@ -44,7 +44,7 @@ const HeroSection = () => {
   return (
     <section className="hero-section" ref={containerRef}>
       <div className="hero-bg">
-        <img src="/images/cinematic.png" alt="McLaren Cinematic" loading="eager" />
+        <img src="/images/cinematic.png" alt="McLaren Cinematic" loading="eager" decoding="async" />
         <div className="hero-overlay"></div>
       </div>
       <div className="hero-content">
@@ -60,6 +60,6 @@ const HeroSection = () => {
       </div>
     </section>
   );
-};
+});
 
 export default HeroSection;

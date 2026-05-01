@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, memo, useCallback } from 'react';
 import './CustomizationPanel.css';
 
 const colors = [
@@ -9,8 +9,12 @@ const colors = [
   { name: 'Silica White', hex: '#F9FAFB', filter: 'hue-rotate(0deg) saturate(0) brightness(2)' }
 ];
 
-const CustomizationPanel = () => {
+const CustomizationPanel = memo(() => {
   const [activeColor, setActiveColor] = useState(colors[0]);
+
+  const handleColorChange = useCallback((color) => {
+    setActiveColor(color);
+  }, []);
 
   return (
     <section className="customization-panel" id="customization">
@@ -28,6 +32,7 @@ const CustomizationPanel = () => {
             className="base-car"
             style={{ filter: activeColor.filter }}
             loading="lazy"
+            decoding="async"
           />
         </div>
 
@@ -41,7 +46,7 @@ const CustomizationPanel = () => {
                 key={color.name}
                 className={`swatch ${activeColor.name === color.name ? 'active' : ''}`}
                 style={{ backgroundColor: color.hex }}
-                onClick={() => setActiveColor(color)}
+                onClick={() => handleColorChange(color)}
                 aria-label={`Select ${color.name}`}
               />
             ))}
@@ -50,6 +55,6 @@ const CustomizationPanel = () => {
       </div>
     </section>
   );
-};
+});
 
 export default CustomizationPanel;

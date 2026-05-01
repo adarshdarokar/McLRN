@@ -1,11 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, memo } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import './PerformanceSection.css';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const PerformanceSection = () => {
+const PerformanceSection = memo(() => {
   const containerRef = useRef(null);
   const rpmNeedleRef = useRef(null);
   const speedRef = useRef(null);
@@ -44,8 +44,8 @@ const PerformanceSection = () => {
 
       // Animate throttle bar
       tl.fromTo(throttleRef.current,
-        { height: '0%' },
-        { height: '100%', ease: 'power3.out', duration: 2 },
+        { scaleY: 0 },
+        { scaleY: 1, ease: 'power3.out', duration: 2 },
         0
       );
 
@@ -89,6 +89,6 @@ const PerformanceSection = () => {
       </div>
     </section>
   );
-};
+});
 
 export default PerformanceSection;

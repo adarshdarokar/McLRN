@@ -1,15 +1,16 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, Suspense, lazy } from 'react';
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
 import ScrollStory from './components/ScrollStory';
-import CarShowcase from './components/CarShowcase';
-import SpecsSection from './components/SpecsSection';
-import PerformanceSection from './components/PerformanceSection';
-import CustomizationPanel from './components/CustomizationPanel';
-import Footer from './components/Footer';
 import './App.css';
 
 import gsap from 'gsap';
+
+const CarShowcase = lazy(() => import('./components/CarShowcase'));
+const SpecsSection = lazy(() => import('./components/SpecsSection'));
+const PerformanceSection = lazy(() => import('./components/PerformanceSection'));
+const CustomizationPanel = lazy(() => import('./components/CustomizationPanel'));
+const Footer = lazy(() => import('./components/Footer'));
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
 
@@ -21,12 +22,12 @@ function App() {
   useEffect(() => {
     // Smooth scrolling using Lenis
     const lenis = new Lenis({
-      lerp: 0.05, 
+      lerp: 0.1, 
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
       wheelMultiplier: 1, 
-      smoothTouch: true,
+      syncTouch: true,
       touchMultiplier: 2,
     });
 
@@ -38,14 +39,13 @@ function App() {
     gsap.ticker.lagSmoothing(0);
 
     // Custom Cursor tracking
+    const xTo = gsap.quickTo(cursorRef.current, "x", { duration: 0.15, ease: "power2.out" });
+    const yTo = gsap.quickTo(cursorRef.current, "y", { duration: 0.15, ease: "power2.out" });
+
     const onMouseMove = (e) => {
       if (cursorRef.current) {
-        gsap.to(cursorRef.current, {
-          x: e.clientX,
-          y: e.clientY,
-          duration: 0.15,
-          ease: "power2.out"
-        });
+        xTo(e.clientX);
+        yTo(e.clientY);
       }
     };
 
@@ -63,11 +63,13 @@ function App() {
       <Navbar />
       <HeroSection />
       <ScrollStory />
-      <CarShowcase />
-      <PerformanceSection />
-      <SpecsSection />
-      <CustomizationPanel />
-      <Footer />
+      <Suspense fallback={<div style={{ height: '100vh', background: '#1E1F22' }}></div>}>
+        <CarShowcase />
+        <PerformanceSection />
+        <SpecsSection />
+        <CustomizationPanel />
+        <Footer />
+      </Suspense>
     </div>
   );
 }
