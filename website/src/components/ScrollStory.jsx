@@ -200,18 +200,13 @@ const ScrollStory = memo(() => {
         const isMobileScreen = window.innerWidth <= 768;
         
         if (isMobileScreen) {
-          // Contain logic: ensure image is fully visible without cropping
-          if (canvasAspect > imgAspect) {
-            drawHeight = canvas.height;
-            drawWidth = firstImage.width * (canvas.height / firstImage.height);
-            offsetX = (canvas.width - drawWidth) / 2;
-            offsetY = 0;
-          } else {
-            drawWidth = canvas.width;
-            drawHeight = firstImage.height * (canvas.width / firstImage.width);
-            offsetX = 0;
-            offsetY = (canvas.height - drawHeight) / 2;
-          }
+          // Hybrid logic for mobile: Fit width, but apply a slight cinematic zoom 
+          // so the car is larger on screen without severe horizontal cropping.
+          const mobileZoom = 1.4; // 40% zoom on mobile
+          drawWidth = canvas.width * mobileZoom;
+          drawHeight = firstImage.height * (canvas.width / firstImage.width) * mobileZoom;
+          offsetX = (canvas.width - drawWidth) / 2;
+          offsetY = (canvas.height - drawHeight) / 2;
         } else {
           // Original cover logic for desktop
           if (canvasAspect > imgAspect) {
