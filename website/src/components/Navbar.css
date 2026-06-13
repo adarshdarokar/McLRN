@@ -112,28 +112,50 @@
     display: flex;
   }
   
+  .navbar-backdrop {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 999;
+    visibility: hidden;
+    opacity: 0;
+  }
+
   .navbar-menu {
     position: fixed;
     top: 0;
-    right: -100%;
-    width: 100%;
+    right: 0;
+    width: 80%;
+    max-width: 400px;
     height: 100dvh;
-    background: rgba(15, 15, 17, 0.98);
+    background: rgba(15, 15, 17, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-left: 1px solid rgba(255, 255, 255, 0.05);
     flex-direction: column;
     justify-content: center;
-    gap: 2rem;
-    transition: right 0.4s cubic-bezier(0.77, 0, 0.175, 1);
-  }
-  
-  .navbar-menu.open {
-    right: 0;
+    gap: 2.5rem;
+    padding: 3rem;
+    z-index: 1000;
   }
   
   .navbar-menu a {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
+    letter-spacing: 0.1em;
+    width: 100%;
+    text-align: right;
   }
   
   .inquire-btn {
     margin-top: 2rem;
+    width: 100%;
+    padding: 1.2rem;
+    font-size: 1rem;
   }
 }
