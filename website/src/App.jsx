@@ -22,11 +22,11 @@ function App() {
   useEffect(() => {
     // Smooth scrolling using Lenis
     const lenis = new Lenis({
-      lerp: 0.1, 
+      lerp: 0.15, 
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
-      wheelMultiplier: 1, 
+      wheelMultiplier: 1.2, 
       syncTouch: true,
       touchMultiplier: 2,
     });

@@ -23,6 +23,7 @@
   height: 100%;
   object-fit: cover;
   transform: scale(1.05); /* Avoid edge bleeding on scroll */
+  will-change: transform;
 }
 
 .hero-overlay {
