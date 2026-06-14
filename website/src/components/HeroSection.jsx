@@ -44,7 +44,7 @@ const HeroSection = memo(() => {
   return (
     <section className="hero-section" ref={containerRef}>
       <div className="hero-bg">
-        <img src="/images/cinematic.png" alt="McLaren Cinematic" loading="eager" decoding="async" />
+        <img src="/images/3c3657636cbac7a1dd8f06eaf5868619.jpg" alt="McLaren Cinematic" loading="eager" decoding="async" />
         <div className="hero-overlay"></div>
       </div>
       <div className="hero-content">
